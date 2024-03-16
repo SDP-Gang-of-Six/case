@@ -31,9 +31,7 @@ public class IllnessController {
     @PostMapping("/addIllness")
     public Result addIllness(@RequestBody Illness illness) {
         String illnessName = illness.getIllnessName();
-        Illness oldIllness = illnessService.lambdaQuery()
-                .eq(Illness::getIllnessName, illnessName)
-                .one();
+        Illness oldIllness = illnessService.getByIllnessName(illnessName);
         if(oldIllness == null || oldIllness.getDeleted() == true) {
             illnessService.save(illness);
             return Result.success();

@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface IllnessService extends IService<Illness> {
     List<Illness> getAll();
+
+    Illness getByIllnessName(String illnessName);
 }
