@@ -10,7 +10,7 @@
         <relativePath>../allParent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>case</artifactId>
+    <artifactId>illness</artifactId>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
