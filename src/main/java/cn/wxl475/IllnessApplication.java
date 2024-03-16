@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @MapperScan("cn.wxl475.mapper")
-public class CaseApplication {
+public class IllnessApplication {
     public static void main(String[] args) {
-        SpringApplication.run(CaseApplication.class,args);
+        SpringApplication.run(IllnessApplication.class,args);
     }
 }

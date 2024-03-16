@@ -68,4 +68,11 @@ public class IllnessController {
             PageHelper.clearPage();
         }
     }
+
+    @GetMapping("/getByIllnessType/{illnessType}")
+    public Result getByIllnessType(@PathVariable Integer illnessType) {
+        return Result.success(illnessService.getByType(illnessType));
+    }
+
+
 }

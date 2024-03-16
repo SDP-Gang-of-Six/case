@@ -37,4 +37,11 @@ public class IllnessServiceImpl extends ServiceImpl<IllnessMapper, Illness> impl
         QueryWrapper<Illness> wrapper = new QueryWrapper<Illness>().eq("illness_name", illnessName);
         return illnessMapper.selectOne(wrapper);
     }
+
+    @Override
+    @DS("slave")
+    public List<Illness> getByType(Integer illnessType) {
+        QueryWrapper<Illness> wrapper = new QueryWrapper<Illness>().eq("illness_type", illnessType);
+        return illnessMapper.selectList(wrapper);
+    }
 }
