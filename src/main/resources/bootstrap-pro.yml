@@ -1,6 +1,6 @@
 spring:
   application:
-    name: case #服务名称
+    name: illness #服务名称
   cloud: #要注意缩进，错了会无法注册
     nacos:
       config:
