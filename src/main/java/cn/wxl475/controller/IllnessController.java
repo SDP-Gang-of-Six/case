@@ -7,6 +7,7 @@ import cn.wxl475.config.DefaultFeignConfiguration;
 import cn.wxl475.pojo.Illness;
 import cn.wxl475.pojo.Result;
 import cn.wxl475.pojo.User;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static cn.wxl475.redis.RedisConstants.CACHE_ILLNESS_KEY;
@@ -42,14 +44,11 @@ public class IllnessController {
     }
 
     @PostMapping("/deleteIllness")
-    public Result deleteIllness(@RequestBody List<Illness> illnesses) {
-        for(Illness illness: illnesses) {
-            illnessService.lambdaUpdate()
-                    .set(Illness::getDeleted, true)
-                    .eq(Illness::getIllnessId, illness.getIllnessId())
-                    .update();
-            stringRedisTemplate.delete(CACHE_ILLNESS_KEY + illness.getIllnessId());
+    public Result deleteIllness(@RequestBody List<Long> ids) {
+        for(Long id: ids) {
+            stringRedisTemplate.delete(CACHE_ILLNESS_KEY + id);
         }
+        illnessService.removeBatchByIds(ids);
         return Result.success();
     }
 
