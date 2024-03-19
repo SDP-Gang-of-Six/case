@@ -32,7 +32,7 @@ public class IllnessController {
     public Result addIllness(@RequestBody Illness illness) {
         String illnessName = illness.getIllnessName();
         Illness oldIllness = illnessService.getByIllnessName(illnessName);
-        if(oldIllness == null || oldIllness.getDeleted() == true) {
+        if(oldIllness == null) {
             illnessService.save(illness);
             return Result.success();
         }
