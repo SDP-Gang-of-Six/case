@@ -36,6 +36,7 @@ public class IllnessController {
     public Result addIllness(@RequestBody Illness illness) {
         String illnessName = illness.getIllnessName();
         Illness oldIllness = illnessService.getByIllnessName(illnessName);
+        System.out.println(oldIllness);
         if(oldIllness == null) {
             illnessService.save(illness);
             return Result.success();
