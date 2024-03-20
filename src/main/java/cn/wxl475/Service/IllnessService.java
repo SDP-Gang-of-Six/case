@@ -11,4 +11,6 @@ public interface IllnessService extends IService<Illness> {
     Illness getByIllnessName(String illnessName);
 
     List<Illness> getByType(Integer illnessType);
+
+    Illness getIllnessById(Long illnessId);
 }

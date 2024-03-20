@@ -4,6 +4,7 @@ package cn.wxl475.Service.impl;
 import cn.wxl475.Service.IllnessService;
 import cn.wxl475.mapper.IllnessMapper;
 import cn.wxl475.pojo.Illness;
+import cn.wxl475.pojo.User;
 import cn.wxl475.redis.CacheClient;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -13,6 +14,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import static cn.wxl475.redis.RedisConstants.*;
 
 @Service
 public class IllnessServiceImpl extends ServiceImpl<IllnessMapper, Illness> implements IllnessService {
@@ -43,5 +47,19 @@ public class IllnessServiceImpl extends ServiceImpl<IllnessMapper, Illness> impl
     public List<Illness> getByType(Integer illnessType) {
         QueryWrapper<Illness> wrapper = new QueryWrapper<Illness>().eq("illness_type", illnessType);
         return illnessMapper.selectList(wrapper);
+    }
+
+    @Override
+    @DS("slave")
+    public Illness getIllnessById(Long illnessId) {
+        return cacheClient.queryWithPassThrough(
+                CACHE_ILLNESS_KEY,
+                LOCK_ILLNESS_KEY,
+                illnessId,
+                Illness.class,
+                id ->  illnessMapper.selectById(illnessId),
+                CACHE_ILLNESS_TTL,
+                TimeUnit.MINUTES
+        );
     }
 }

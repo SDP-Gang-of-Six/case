@@ -10,6 +10,7 @@ import cn.wxl475.pojo.User;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -23,6 +24,7 @@ import static cn.wxl475.redis.RedisConstants.CACHE_ILLNESS_KEY;
 @RestController
 @RequestMapping("/illness")
 @EnableFeignClients(clients = DataClient.class, defaultConfiguration = DefaultFeignConfiguration.class)
+@Slf4j
 public class IllnessController {
     @Autowired
     private IllnessService illnessService;
@@ -71,6 +73,19 @@ public class IllnessController {
     @GetMapping("/getByIllnessType/{illnessType}")
     public Result getByIllnessType(@PathVariable Integer illnessType) {
         return Result.success(illnessService.getByType(illnessType));
+    }
+
+    @PostMapping("/updateIllness")
+    public Result updateIllness(@RequestBody Illness illness) {
+        illnessService.updateById(illness);
+        stringRedisTemplate.delete(CACHE_ILLNESS_KEY + illness.getIllnessId());
+        return Result.success();
+    }
+
+    @GetMapping("/getIllnessById/{illnessId}")
+    public Result getIllnessById(@PathVariable Long illnessId) {
+        Illness illness = illnessService.getIllnessById(illnessId);
+        return Result.success(illness);
     }
 
 
