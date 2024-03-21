@@ -71,9 +71,20 @@ public class IllnessController {
         }
     }
 
-    @GetMapping("/getByIllnessType/{illnessType}")
-    public Result getByIllnessType(@PathVariable Integer illnessType) {
-        return Result.success(illnessService.getByType(illnessType));
+    @GetMapping("/getByIllnessType/{illnessType}/{pageNum}/{pageSize}")
+    public Result getByIllnessType(@PathVariable Integer illnessType, @PathVariable Integer pageNum, @PathVariable Integer pageSize) {
+        try {
+            //1.引入分页插件,pageNum是第几页，pageSize是每页显示多少条,默认查询总数count
+            PageHelper.startPage(pageNum, pageSize);
+            //2.紧跟的查询就是一个分页查询-必须紧跟.后面的其他查询不会被分页
+            List<Illness> illnessList = illnessService.getByType(illnessType);
+            //3.使用PageInfo包装查询后的结果, pageSize是连续显示的条数
+            PageInfo pageInfo = new PageInfo(illnessList, pageSize);
+            return Result.success(pageInfo);
+        }finally {
+            //清理 ThreadLocal 存储的分页参数,保证线程安全
+            PageHelper.clearPage();
+        }
     }
 
     @PostMapping("/updateIllness")

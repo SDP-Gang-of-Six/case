@@ -32,20 +32,26 @@ public class IllnessServiceImpl extends ServiceImpl<IllnessMapper, Illness> impl
     @Override
     @DS("slave")
     public List<Illness> getAll() {
-        return illnessMapper.selectList(null);
+        QueryWrapper<Illness> wrapper = new QueryWrapper<Illness>()
+                .select("illness_id", "illness_name", "illness_type", "create_time", "update_time");
+        return illnessMapper.selectList(wrapper);
     }
 
     @Override
     @DS("slave")
     public Illness getByIllnessName(String illnessName) {
-        QueryWrapper<Illness> wrapper = new QueryWrapper<Illness>().eq("illness_name", illnessName);
+        QueryWrapper<Illness> wrapper = new QueryWrapper<Illness>()
+                .select("illness_id", "illness_name", "illness_type", "create_time", "update_time")
+                .eq("illness_name", illnessName);
         return illnessMapper.selectOne(wrapper);
     }
 
     @Override
     @DS("slave")
     public List<Illness> getByType(Integer illnessType) {
-        QueryWrapper<Illness> wrapper = new QueryWrapper<Illness>().eq("illness_type", illnessType);
+        QueryWrapper<Illness> wrapper = new QueryWrapper<Illness>()
+                .select("illness_id", "illness_name", "illness_type", "create_time", "update_time")
+                .eq("illness_type", illnessType);
         return illnessMapper.selectList(wrapper);
     }
 
