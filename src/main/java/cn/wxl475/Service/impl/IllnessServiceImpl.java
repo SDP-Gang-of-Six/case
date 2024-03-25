@@ -84,7 +84,7 @@ public class IllnessServiceImpl extends ServiceImpl<IllnessMapper, Illness> impl
     @Override
     public List<Illness> searchIllnessWithKeyword(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder) {
         List<Illness> illnesses = new ArrayList<>();
-        NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder().withPageable(PageRequest.of(pageNum-1, pageSize));
+        NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder().withPageable(PageRequest.of(pageNum - 1, pageSize));
         if(keyword != null && !keyword.isEmpty()){
             queryBuilder.withQuery(QueryBuilders.multiMatchQuery(keyword,"illnessName", "illnessType", "symptom", "process", "consequence", "schedule"));
         }
