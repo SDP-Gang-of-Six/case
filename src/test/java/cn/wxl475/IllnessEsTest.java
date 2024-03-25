@@ -22,7 +22,7 @@ public class IllnessEsTest {
     private IllnessEsRepo illnessEsRepo;
 
     @Test
-    public void creatIllnessIndex(){
+    public void createIllnessIndex(){
         Class<Illness> aClass = Illness.class;
         boolean created = elasticsearchRestTemplate.indexOps(aClass).createWithMapping();
         if(created){
