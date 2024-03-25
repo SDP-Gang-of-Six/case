@@ -4,10 +4,7 @@ package cn.wxl475.Service.impl;
 import cn.wxl475.Service.IllnessService;
 import cn.wxl475.mapper.IllnessMapper;
 import cn.wxl475.pojo.Illness;
-import cn.wxl475.pojo.Image;
-import cn.wxl475.pojo.User;
 import cn.wxl475.redis.CacheClient;
-import cn.wxl475.repo.IllnessEsRepo;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -15,7 +12,6 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHits;
@@ -39,9 +35,6 @@ public class IllnessServiceImpl extends ServiceImpl<IllnessMapper, Illness> impl
 
     @Autowired
     private ElasticsearchRestTemplate elasticsearchRestTemplate;
-
-    @Autowired
-    private IllnessEsRepo illnessEsRepo;
 
     @Autowired
     private CacheClient cacheClient;
