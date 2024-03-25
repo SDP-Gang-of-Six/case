@@ -52,4 +52,5 @@ public class IllnessEsTest {
     public void deleteAllIllness(){
         illnessEsRepo.deleteAll();
     }
+
 }

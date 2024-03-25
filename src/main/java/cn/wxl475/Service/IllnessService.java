@@ -10,7 +10,7 @@ public interface IllnessService extends IService<Illness> {
 
     Illness getByIllnessName(String illnessName);
 
-    List<Illness> getByType(Integer illnessType);
+    List<Illness> getByType(String illnessType);
 
     Illness getIllnessById(Long illnessId);
 

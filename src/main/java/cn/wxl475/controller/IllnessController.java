@@ -79,7 +79,7 @@ public class IllnessController {
     }
 
     @GetMapping("/getByIllnessType/{illnessType}/{pageNum}/{pageSize}")
-    public Result getByIllnessType(@PathVariable Integer illnessType, @PathVariable Integer pageNum, @PathVariable Integer pageSize) {
+    public Result getByIllnessType(@PathVariable String illnessType, @PathVariable Integer pageNum, @PathVariable Integer pageSize) {
         try {
             //1.引入分页插件,pageNum是第几页，pageSize是每页显示多少条,默认查询总数count
             PageHelper.startPage(pageNum, pageSize);
