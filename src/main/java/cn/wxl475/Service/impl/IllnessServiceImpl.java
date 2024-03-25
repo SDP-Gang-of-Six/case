@@ -4,15 +4,24 @@ package cn.wxl475.Service.impl;
 import cn.wxl475.Service.IllnessService;
 import cn.wxl475.mapper.IllnessMapper;
 import cn.wxl475.pojo.Illness;
+import cn.wxl475.pojo.Image;
 import cn.wxl475.pojo.User;
 import cn.wxl475.redis.CacheClient;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -25,6 +34,9 @@ public class IllnessServiceImpl extends ServiceImpl<IllnessMapper, Illness> impl
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private ElasticsearchRestTemplate elasticsearchRestTemplate;
 
     @Autowired
     private CacheClient cacheClient;
@@ -67,5 +79,24 @@ public class IllnessServiceImpl extends ServiceImpl<IllnessMapper, Illness> impl
                 CACHE_ILLNESS_TTL,
                 TimeUnit.MINUTES
         );
+    }
+
+    @Override
+    public List<Illness> searchIllnessWithKeyword(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder) {
+        List<Illness> illnesses = new ArrayList<>();
+        NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder().withPageable(PageRequest.of(pageNum-1, pageSize));
+        if(keyword != null && !keyword.isEmpty()){
+            queryBuilder.withQuery(QueryBuilders.multiMatchQuery(keyword,"illnessName", "illnessType", "symptom", "process", "consequence", "schedule"));
+        }
+        if(sortField == null || sortField.isEmpty()){
+            sortField = "illnessId";
+        }
+        if(sortOrder == null || !(sortOrder == 1 || sortOrder == -1)){
+            sortOrder = -1;
+        }
+        queryBuilder.withSorts(SortBuilders.fieldSort(sortField).order(sortOrder == -1? SortOrder.DESC: SortOrder.ASC));
+        SearchHits<Illness> hits = elasticsearchRestTemplate.search(queryBuilder.build(), Illness.class);
+        hits.forEach(illness -> illnesses.add(illness.getContent()));
+        return illnesses;
     }
 }
