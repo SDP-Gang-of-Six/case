@@ -45,8 +45,8 @@ public class IllnessController {
     @PostMapping("/addIllness")
     public Result addIllness(@RequestHeader("Authorization") String token, @RequestBody Illness illness) {
         Claims claims = JwtUtils.parseJWT(token, signKey);
-        Integer userType = (Integer) claims.get("userType");
-        if(userType == 0) {
+        Boolean userType = (Boolean) claims.get("userType");
+        if(!userType) {
             return Result.error("无增加病例权限");
         }
         String illnessName = illness.getIllnessName();
@@ -64,8 +64,8 @@ public class IllnessController {
     @PostMapping("/deleteIllness")
     public Result deleteIllness(@RequestHeader("Authorization") String token, @RequestBody List<Long> ids) {
         Claims claims = JwtUtils.parseJWT(token, signKey);
-        Integer userType = (Integer) claims.get("userType");
-        if(userType == 0) {
+        Boolean userType = (Boolean) claims.get("userType");
+        if(!userType) {
             return Result.error("无删除病例权限");
         }
         for(Long id: ids) {
@@ -111,8 +111,8 @@ public class IllnessController {
     @PostMapping("/updateIllness")
     public Result updateIllness(@RequestHeader("Authorization") String token, @RequestBody Illness illness) {
         Claims claims = JwtUtils.parseJWT(token, signKey);
-        Integer userType = (Integer) claims.get("userType");
-        if(userType == 0) {
+        Boolean userType = (Boolean) claims.get("userType");
+        if(!userType) {
             return Result.error("无修改病例权限");
         }
         illnessService.updateById(illness);
