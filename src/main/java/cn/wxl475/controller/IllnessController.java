@@ -6,20 +6,18 @@ import cn.wxl475.client.DataClient;
 import cn.wxl475.config.DefaultFeignConfiguration;
 import cn.wxl475.pojo.Illness;
 import cn.wxl475.pojo.Result;
-import cn.wxl475.pojo.User;
 import cn.wxl475.repo.IllnessEsRepo;
 import cn.wxl475.utils.JwtUtils;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static cn.wxl475.redis.RedisConstants.CACHE_ILLNESS_KEY;
@@ -38,8 +36,19 @@ public class IllnessController {
     @Autowired
     private IllnessEsRepo illnessEsRepo;
 
+    @Value("${jwt.signKey}")
+    private String signKey;
+
+    @Value("${jwt.expire}")
+    private Long expire;
+
     @PostMapping("/addIllness")
-    public Result addIllness(@RequestBody Illness illness) {
+    public Result addIllness(@RequestHeader("Authorization") String token, @RequestBody Illness illness) {
+        Claims claims = JwtUtils.parseJWT(token, signKey);
+        Integer userType = (Integer) claims.get("userType");
+        if(userType == 0) {
+            return Result.error("无增加病例权限");
+        }
         String illnessName = illness.getIllnessName();
         Illness oldIllness = illnessService.getByIllnessName(illnessName);
         if(oldIllness == null) {
@@ -53,7 +62,12 @@ public class IllnessController {
     }
 
     @PostMapping("/deleteIllness")
-    public Result deleteIllness(@RequestBody List<Long> ids) {
+    public Result deleteIllness(@RequestHeader("Authorization") String token, @RequestBody List<Long> ids) {
+        Claims claims = JwtUtils.parseJWT(token, signKey);
+        Integer userType = (Integer) claims.get("userType");
+        if(userType == 0) {
+            return Result.error("无删除病例权限");
+        }
         for(Long id: ids) {
             stringRedisTemplate.delete(CACHE_ILLNESS_KEY + id);
         }
@@ -63,7 +77,7 @@ public class IllnessController {
     }
 
     @GetMapping("/illnessPage/{pageNum}/{pageSize}")
-    public Result illnessPage(@PathVariable Integer pageNum, @PathVariable Integer pageSize){
+    public Result illnessPage(@RequestHeader("Authorization") String token, @PathVariable Integer pageNum, @PathVariable Integer pageSize){
         try {
             //1.引入分页插件,pageNum是第几页，pageSize是每页显示多少条,默认查询总数count
             PageHelper.startPage(pageNum, pageSize);
@@ -79,7 +93,7 @@ public class IllnessController {
     }
 
     @GetMapping("/getByIllnessType/{illnessType}/{pageNum}/{pageSize}")
-    public Result getByIllnessType(@PathVariable String illnessType, @PathVariable Integer pageNum, @PathVariable Integer pageSize) {
+    public Result getByIllnessType(@RequestHeader("Authorization") String token, @PathVariable String illnessType, @PathVariable Integer pageNum, @PathVariable Integer pageSize) {
         try {
             //1.引入分页插件,pageNum是第几页，pageSize是每页显示多少条,默认查询总数count
             PageHelper.startPage(pageNum, pageSize);
@@ -95,7 +109,12 @@ public class IllnessController {
     }
 
     @PostMapping("/updateIllness")
-    public Result updateIllness(@RequestBody Illness illness) {
+    public Result updateIllness(@RequestHeader("Authorization") String token, @RequestBody Illness illness) {
+        Claims claims = JwtUtils.parseJWT(token, signKey);
+        Integer userType = (Integer) claims.get("userType");
+        if(userType == 0) {
+            return Result.error("无修改病例权限");
+        }
         illnessService.updateById(illness);
         illnessEsRepo.save(illness);
         stringRedisTemplate.delete(CACHE_ILLNESS_KEY + illness.getIllnessId());
@@ -103,17 +122,18 @@ public class IllnessController {
     }
 
     @GetMapping("/getIllnessById/{illnessId}")
-    public Result getIllnessById(@PathVariable Long illnessId) {
+    public Result getIllnessById(@RequestHeader("Authorization") String token, @PathVariable Long illnessId) {
         Illness illness = illnessService.getIllnessById(illnessId);
         return Result.success(illness);
     }
 
     @PostMapping("/searchIllnessByKeyword")
-    public Result searchIllnessByKeyword(@RequestParam(required = false) String keyword,
-                                        @RequestParam Integer pageNum,
-                                        @RequestParam Integer pageSize,
-                                        @RequestParam(required = false) String sortField,
-                                        @RequestParam(required = false) Integer sortOrder){
+    public Result searchIllnessByKeyword(@RequestHeader("Authorization") String token,
+                                         @RequestParam(required = false) String keyword,
+                                         @RequestParam Integer pageNum,
+                                         @RequestParam Integer pageSize,
+                                         @RequestParam(required = false) String sortField,
+                                         @RequestParam(required = false) Integer sortOrder){
         if(pageNum <= 0 || pageSize <= 0){
             return Result.error("页码或页大小不合法");
         }
