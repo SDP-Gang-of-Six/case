@@ -50,19 +50,41 @@ public class IllnessServiceImpl extends ServiceImpl<IllnessMapper, Illness> impl
     @Override
     @DS("slave")
     public Illness getByIllnessName(String illnessName) {
-        QueryWrapper<Illness> wrapper = new QueryWrapper<Illness>()
-                .select("illness_id", "illness_name", "illness_type", "create_time", "update_time")
-                .eq("illness_name", illnessName);
-        return illnessMapper.selectOne(wrapper);
+//        QueryWrapper<Illness> wrapper = new QueryWrapper<Illness>()
+//                .select("illness_id", "illness_name", "illness_type", "create_time", "update_time")
+//                .eq("illness_name", illnessName);
+//        return illnessMapper.selectOne(wrapper);
+        return cacheClient.queryWithPassThrough(
+                CACHE_ILLNESS_KEY,
+                LOCK_ILLNESS_KEY,
+                illnessName,
+                Illness.class,
+                id -> illnessMapper.selectOne(new QueryWrapper<Illness>()
+                        .select("illness_id", "illness_name", "illness_type", "create_time", "update_time")
+                        .eq("illness_name", illnessName)),
+                CACHE_ILLNESS_TTL,
+                TimeUnit.MINUTES
+        );
     }
 
     @Override
     @DS("slave")
     public List<Illness> getByType(String illnessType) {
-        QueryWrapper<Illness> wrapper = new QueryWrapper<Illness>()
-                .select("illness_id", "illness_name", "illness_type", "create_time", "update_time")
-                .eq("illness_type", illnessType);
-        return illnessMapper.selectList(wrapper);
+//        QueryWrapper<Illness> wrapper = new QueryWrapper<Illness>()
+//                .select("illness_id", "illness_name", "illness_type", "create_time", "update_time")
+//                .eq("illness_type", illnessType);
+//        return illnessMapper.selectList(wrapper);
+        return cacheClient.queryListWithPassThrough(
+                CACHE_ILLNESS_KEY,
+                LOCK_ILLNESS_KEY,
+                illnessType,
+                Illness.class,
+                id -> illnessMapper.selectList(new QueryWrapper<Illness>()
+                        .select("illness_id", "illness_name", "illness_type", "create_time", "update_time")
+                        .eq("illness_type", illnessType)),
+                CACHE_ILLNESS_TTL,
+                TimeUnit.MINUTES
+        );
     }
 
     @Override
