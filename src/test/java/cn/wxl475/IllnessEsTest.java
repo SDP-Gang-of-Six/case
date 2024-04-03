@@ -2,6 +2,7 @@ package cn.wxl475;
 
 
 import cn.wxl475.pojo.Illness;
+import cn.wxl475.pojo.base.Charge.Charge;
 import cn.wxl475.repo.IllnessEsRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -40,6 +41,18 @@ public class IllnessEsTest {
             log.info("删除索引：{}",aClass.getName()+",成功");
         }else {
             log.info("删除索引：{}",aClass.getName()+",失败");
+        }
+    }
+
+    @Test
+    public void rebuildIllnessesIndex(){
+        Class<Illness> aClass = Illness.class;
+        boolean deleted = elasticsearchRestTemplate.indexOps(aClass).delete();
+        boolean created = elasticsearchRestTemplate.indexOps(aClass).createWithMapping();
+        if(deleted&&created){
+            log.info("重建索引：{}",aClass.getName()+",成功");
+        }else {
+            log.info("重建索引：{}",aClass.getName()+",失败");
         }
     }
 
