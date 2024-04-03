@@ -115,6 +115,11 @@ public class IllnessController {
         if(!userType) {
             return Result.error("无修改病例权限");
         }
+        String illnessName = illness.getIllnessName();
+        Illness oldIllness = illnessService.getByIllnessName(illnessName);
+        if(oldIllness.getIllnessId() != illness.getIllnessId()) {
+            return Result.error("病例名不能重复");
+        }
         illnessService.updateById(illness);
         illnessEsRepo.save(illness);
         stringRedisTemplate.delete(CACHE_ILLNESS_KEY + illness.getIllnessId());
