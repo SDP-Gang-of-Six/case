@@ -1,6 +1,7 @@
 package cn.wxl475.Service;
 
 import cn.wxl475.pojo.Illness;
+import cn.wxl475.pojo.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -14,5 +15,5 @@ public interface IllnessService extends IService<Illness> {
 
     Illness getIllnessById(Long illnessId);
 
-    List<Illness> searchIllnessWithKeyword(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder);
+    Page<Illness> searchIllnessWithKeyword(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder);
 }

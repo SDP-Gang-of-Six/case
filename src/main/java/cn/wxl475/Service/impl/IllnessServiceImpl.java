@@ -4,6 +4,7 @@ package cn.wxl475.Service.impl;
 import cn.wxl475.Service.IllnessService;
 import cn.wxl475.mapper.IllnessMapper;
 import cn.wxl475.pojo.Illness;
+import cn.wxl475.pojo.Page;
 import cn.wxl475.redis.CacheClient;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -102,8 +103,8 @@ public class IllnessServiceImpl extends ServiceImpl<IllnessMapper, Illness> impl
     }
 
     @Override
-    public List<Illness> searchIllnessWithKeyword(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder) {
-        List<Illness> illnesses = new ArrayList<>();
+    public Page<Illness> searchIllnessWithKeyword(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder) {
+        Page<Illness> illnesses = new Page<>(0L, new ArrayList<>());
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder().withPageable(PageRequest.of(pageNum - 1, pageSize));
         if(keyword != null && !keyword.isEmpty()){
             queryBuilder.withQuery(QueryBuilders.multiMatchQuery(keyword,"illnessName", "illnessType", "symptom", "process", "consequence", "schedule"));
@@ -116,7 +117,8 @@ public class IllnessServiceImpl extends ServiceImpl<IllnessMapper, Illness> impl
         }
         queryBuilder.withSorts(SortBuilders.fieldSort(sortField).order(sortOrder == -1? SortOrder.DESC: SortOrder.ASC));
         SearchHits<Illness> hits = elasticsearchRestTemplate.search(queryBuilder.build(), Illness.class);
-        hits.forEach(illness -> illnesses.add(illness.getContent()));
+        hits.forEach(illness -> illnesses.getData().add(illness.getContent()));
+        illnesses.setTotalNumber(hits.getTotalHits());
         return illnesses;
     }
 }
