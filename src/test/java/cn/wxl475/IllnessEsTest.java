@@ -2,7 +2,6 @@ package cn.wxl475;
 
 
 import cn.wxl475.pojo.Illness;
-import cn.wxl475.pojo.base.Charge.Charge;
 import cn.wxl475.repo.IllnessEsRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
