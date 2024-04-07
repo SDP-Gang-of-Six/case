@@ -50,6 +50,29 @@ public class IllnessController {
             return Result.error("无增加病例权限");
         }
         String illnessName = illness.getIllnessName();
+        String illnessType = illness.getIllnessType();
+        String symptom = illness.getSymptom();
+        String process = illness.getProcess();
+        String consequence = illness.getConsequence();
+        String schedule = illness.getSchedule();
+        if(illnessName == null || illnessName.isEmpty()) {
+            return Result.error("病例名称不能为空");
+        }
+        if(illnessType == null || illnessType.isEmpty()) {
+            return Result.error("病例类型不能为空");
+        }
+        if(symptom == null || symptom.isEmpty()) {
+            return Result.error("症状不能为空");
+        }
+        if(process == null || process.isEmpty()) {
+            return Result.error("检查过程不能为空");
+        }
+        if(consequence == null || consequence.isEmpty()) {
+            return Result.error("诊断结果不能为空");
+        }
+        if(schedule == null || schedule.isEmpty()) {
+            return Result.error("治疗方案不能为空");
+        }
         Illness oldIllness = illnessService.getByIllnessName(illnessName);
         if(oldIllness == null) {
             illnessService.save(illness);
