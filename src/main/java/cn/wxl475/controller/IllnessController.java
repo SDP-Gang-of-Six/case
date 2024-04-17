@@ -19,6 +19,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 import static cn.wxl475.redis.RedisConstants.CACHE_ILLNESS_KEY;
 
@@ -140,7 +141,7 @@ public class IllnessController {
         }
         String illnessName = illness.getIllnessName();
         Illness oldIllness = illnessService.getByIllnessName(illnessName);
-        if(oldIllness.getIllnessId() != illness.getIllnessId()) {
+        if(oldIllness != null && !oldIllness.getIllnessId().equals(illness.getIllnessId())) {
             return Result.error("病例名不能重复");
         }
         illnessService.updateById(illness);
