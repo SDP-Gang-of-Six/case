@@ -51,21 +51,10 @@ public class IllnessServiceImpl extends ServiceImpl<IllnessMapper, Illness> impl
     @Override
     @DS("slave")
     public Illness getByIllnessName(String illnessName) {
-//        QueryWrapper<Illness> wrapper = new QueryWrapper<Illness>()
-//                .select("illness_id", "illness_name", "illness_type", "create_time", "update_time")
-//                .eq("illness_name", illnessName);
-//        return illnessMapper.selectOne(wrapper);
-        return cacheClient.queryWithPassThrough(
-                CACHE_ILLNESS_KEY,
-                LOCK_ILLNESS_KEY,
-                illnessName,
-                Illness.class,
-                id -> illnessMapper.selectOne(new QueryWrapper<Illness>()
-                        .select("illness_id", "illness_name", "illness_type", "create_time", "update_time")
-                        .eq("illness_name", illnessName)),
-                CACHE_ILLNESS_TTL,
-                TimeUnit.MINUTES
-        );
+        QueryWrapper<Illness> wrapper = new QueryWrapper<Illness>()
+                .select("illness_id", "illness_name", "illness_type", "create_time", "update_time")
+                .eq("illness_name", illnessName);
+        return illnessMapper.selectOne(wrapper);
     }
 
     @Override
@@ -107,7 +96,7 @@ public class IllnessServiceImpl extends ServiceImpl<IllnessMapper, Illness> impl
         Page<Illness> illnesses = new Page<>(0L, new ArrayList<>());
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder().withPageable(PageRequest.of(pageNum - 1, pageSize));
         if(keyword != null && !keyword.isEmpty()){
-            queryBuilder.withQuery(QueryBuilders.multiMatchQuery(keyword,"illnessName", "illnessType", "symptom", "process", "consequence", "schedule"));
+            queryBuilder.withQuery(QueryBuilders.multiMatchQuery(keyword,"illnessName", "illnessType", "symptom", "process", "consequence", "schedule", "createTime", "updateTime"));
         }
         if(sortField == null || sortField.isEmpty()){
             sortField = "illnessId";
